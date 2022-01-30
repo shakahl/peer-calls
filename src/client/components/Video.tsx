@@ -18,6 +18,7 @@ export interface VideoProps {
   mirrored: boolean
   play: () => void
   localUser?: boolean
+  style?: React.CSSProperties
 }
 
 export default class Video extends React.PureComponent<VideoProps> {
@@ -72,7 +73,7 @@ export default class Video extends React.PureComponent<VideoProps> {
     const streamId = this.props.stream && this.props.stream.streamId
 
     return (
-      <div className={className}>
+      <div className={className} style={this.props.style}>
         <video
           id={`video-${peerId}`}
           autoPlay
