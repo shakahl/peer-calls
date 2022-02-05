@@ -5,7 +5,7 @@ import Peer from 'simple-peer'
 import { hangUp } from '../actions/CallActions'
 import { getDesktopStream } from '../actions/MediaActions'
 import { dismissNotification, Notification } from '../actions/NotifyActions'
-import { MinimizeTogglePayload, removeLocalStream, StreamTypeDesktop } from '../actions/StreamActions'
+import { MaximizeParams, MinimizeTogglePayload, removeLocalStream, StreamTypeDesktop } from '../actions/StreamActions'
 import * as constants from '../constants'
 import { Message } from '../reducers/messages'
 import { Nicknames } from '../reducers/nicknames'
@@ -34,6 +34,7 @@ export interface AppProps {
   removeLocalStream: typeof removeLocalStream
   sendFile: (file: File) => void
   windowStates: WindowStates
+  maximize: (payload: MaximizeParams) => void
   minimizeToggle: (payload: MinimizeTogglePayload) => void
   hangUp: typeof hangUp
   settings: SettingsState
@@ -81,6 +82,7 @@ export default class App extends React.PureComponent<AppProps, AppState> {
       messages,
       messagesCount,
       minimizeToggle,
+      maximize,
       sendFile,
       sendText,
       settings,
@@ -123,6 +125,7 @@ export default class App extends React.PureComponent<AppProps, AppState> {
         <Media />
         {this.props.dialState !== constants.DIAL_STATE_HUNG_UP &&
           <Videos
+            onMaximize={maximize}
             onMinimizeToggle={minimizeToggle}
             play={this.props.play}
             showMinimizedToolbar={settings.showMinimizedToolbar}

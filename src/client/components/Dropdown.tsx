@@ -9,14 +9,25 @@ export interface DropdownProps {
 
 export interface DropdownState {
   open: boolean
+  below: boolean
 }
 
 export class Dropdown
 extends React.PureComponent<DropdownProps, DropdownState> {
-  state = { open: false }
+  state = {
+    open: false,
+    below: false,
+  }
+  ref = React.createRef<HTMLUListElement>()
 
   handleClick = () => {
-    this.setState({ open: !this.state.open })
+    // const { top } = this.ref.current!.getBoundingClientRect()
+
+    this.setState({
+      open: !this.state.open,
+      // below: top < 0, // FIXME this will be flipping
+      below: false,
+    })
   }
   close = () => {
     this.setState({ open: false })
@@ -25,6 +36,7 @@ extends React.PureComponent<DropdownProps, DropdownState> {
     const { handleClick } = this
     const classNames = classnames('dropdown-list', {
       'dropdown-list-open': this.state.open,
+      'dropdown-list-below': this.state.below,
     })
 
     const menu = React.Children.map(
@@ -47,7 +59,7 @@ extends React.PureComponent<DropdownProps, DropdownState> {
       <div className='dropdown'>
         <button onClick={handleClick} >{this.props.label}</button>
         <Backdrop onClick={this.close} visible={this.state.open} />
-        <ul className={classNames}>
+        <ul className={classNames} ref={this.ref}>
           {menu}
         </ul>
       </div>

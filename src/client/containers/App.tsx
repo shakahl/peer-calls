@@ -3,7 +3,7 @@ import { hangUp, init } from '../actions/CallActions'
 import { sendFile, sendText } from '../actions/ChatActions'
 import { getDesktopStream, play } from '../actions/MediaActions'
 import { dismissNotification } from '../actions/NotifyActions'
-import { minimizeToggle, removeLocalStream } from '../actions/StreamActions'
+import { maximize, minimizeToggle, removeLocalStream } from '../actions/StreamActions'
 import App from '../components/App'
 import { State } from '../store'
 
@@ -24,6 +24,7 @@ function mapStateToProps (state: State) {
 const mapDispatchToProps = {
   hangUp,
   minimizeToggle,
+  maximize,
   sendText,
   dismissNotification,
   getDesktopStream,

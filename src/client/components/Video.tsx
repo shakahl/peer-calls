@@ -3,12 +3,13 @@ import classnames from 'classnames'
 import { StreamWithURL } from '../reducers/streams'
 import { Dropdown } from './Dropdown'
 import { WindowState } from '../reducers/windowStates'
-import { MinimizeTogglePayload } from '../actions/StreamActions'
+import { MaximizeParams, MinimizeTogglePayload } from '../actions/StreamActions'
 import { MdCrop, MdZoomIn, MdZoomOut, MdMenu } from 'react-icons/md'
 
 import VUMeter from './VUMeter'
 
 export interface VideoProps {
+  onMaximize: (payload: MaximizeParams) => void
   onMinimizeToggle: (payload: MinimizeTogglePayload) => void
   nickname: string
   windowState: WindowState
@@ -56,6 +57,12 @@ export default class Video extends React.PureComponent<VideoProps> {
       streamId: this.props.stream && this.props.stream.streamId,
     })
   }
+  handleMaximize = () => {
+    this.props.onMaximize({
+      peerId: this.props.peerId,
+      streamId: this.props.stream && this.props.stream.streamId,
+    })
+  }
   handleToggleCover = () => {
     const v = this.videoRef.current
     if (v) {
@@ -86,9 +93,13 @@ export default class Video extends React.PureComponent<VideoProps> {
           <VUMeter streamId={streamId} />
           <span className='nickname'>{this.props.nickname}</span>
           <Dropdown label={<MdMenu />}>
+            <li className='action-maximize' onClick={this.handleMaximize}>
+              <MdZoomIn />&nbsp;
+              Maximize
+            </li>
             <li className='action-minimize' onClick={this.handleMinimize}>
               {minimized ? <MdZoomIn /> : <MdZoomOut /> }&nbsp;
-              {minimized ? 'Maximize': 'Minimize' }
+              Toggle Minimize
             </li>
             <li className='action-toggle-fit' onClick={this.handleToggleCover}>
               <MdCrop /> Toggle Fit

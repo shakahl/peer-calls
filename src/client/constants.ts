@@ -1,4 +1,5 @@
 export const MINIMIZE_TOGGLE = 'MINIMIZE_TOGGLE'
+export const MAXIMIZE = 'MAXIMIZE'
 
 export const ALERT = 'ALERT'
 export const ALERT_DISMISS = 'ALERT_DISMISS'

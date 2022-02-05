@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
-import { MinimizeTogglePayload } from '../actions/StreamActions'
+import { MaximizeParams, MinimizeTogglePayload } from '../actions/StreamActions'
 import { Dim, Frame } from '../frame'
 import { getStreamsByState, StreamProps } from '../selectors'
 import { State } from '../store'
@@ -11,6 +11,7 @@ export interface VideosProps {
   maximized: StreamProps[]
   minimized: StreamProps[]
   play: () => void
+  onMaximize: (payload: MaximizeParams) => void
   onMinimizeToggle: (payload: MinimizeTogglePayload) => void
   showMinimizedToolbar: boolean
   aspectRatio: number
@@ -108,6 +109,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
           <Video
             {...props}
             key={props.key}
+            onMaximize={this.props.onMaximize}
             onMinimizeToggle={this.props.onMinimizeToggle}
             play={this.props.play}
           />
@@ -147,6 +149,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
           <Video
             {...props}
             key={props.key}
+            onMaximize={this.props.onMaximize}
             onMinimizeToggle={this.props.onMinimizeToggle}
             play={this.props.play}
             style={this.videoStyle}
