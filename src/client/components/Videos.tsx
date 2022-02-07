@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import classnames from 'classnames'
 import { MaximizeParams, MinimizeTogglePayload } from '../actions/StreamActions'
 import { Dim, Frame } from '../frame'
 import { getStreamsByState, StreamProps } from '../selectors'
@@ -27,6 +26,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
   private gridRef = React.createRef<HTMLDivElement>()
   private frame: Frame
   private videoStyle?: React.CSSProperties
+  private resizeObserver: ResizeObserver
 
   constructor(props: VideosProps) {
     super(props)
@@ -37,26 +37,42 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
     }
 
     this.frame = new Frame(this.props.aspectRatio || 16/9)
+
+    this.resizeObserver = new ResizeObserver(this.handleResize)
   }
   componentDidMount = () => {
     this.handleResize()
-    window.addEventListener('resize', this.handleResize)
+
+    // FIXME if we change style the current might change.
+    // Maybe not because it uses the same key.
+    this.resizeObserver.observe(this.gridRef.current!)
   }
   componentWillUnmount = () => {
-    window.removeEventListener('resize', this.handleResize)
+    this.resizeObserver.disconnect()
   }
   handleResize = () => {
-    // We use document.body and not this.gridRef.current! because in certain
-    // scenarios it might stop scaling.
-    const { width: x, height: y } = document.body.getBoundingClientRect()
-
-    const size = {x, y}
+    const size = this.getSize()
+    if (!size) {
+      return
+    }
 
     this.frame.setSize(size)
 
     this.setState({
       videoSize: size,
     })
+  }
+  getSize = () => {
+    if (!this.gridRef.current) {
+      return
+    }
+
+    const { width: x, height: y } =
+      this.gridRef.current.getBoundingClientRect()
+
+    const size = {x, y}
+
+    return size
   }
   componentDidUpdate() {
     if (this.props.aspectRatio) {
@@ -72,7 +88,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
       v.style.flexBasis = x + '%'
     })
   }
-  updateSizeStyle() {
+  maybeUpdateSizeStyle() {
     const {aspectRatio, maximized} = this.props
     const multiplier = parseInt(this.state.multiplier) || 1
 
@@ -81,46 +97,28 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
       return
     }
 
-    if (this.props.aspectRatio) {
-      this.frame.setAspectRatio(aspectRatio)
-      this.frame.setNumWindows(maximized.length * multiplier)
+    this.frame.setAspectRatio(aspectRatio)
+    this.frame.setNumWindows(maximized.length * multiplier)
 
-      if (this.frame.needsCalc() || !this.videoStyle) {
-        const size = this.frame.calcSize()
+    if (this.frame.needsCalc() || !this.videoStyle) {
+      const size = this.frame.calcSize()
 
-        this.videoStyle = {
-          width: size.x,
-          height: size.y,
-        }
+      this.videoStyle = {
+        width: size.x,
+        height: size.y,
       }
     }
   }
   render() {
     const { minimized, maximized, showMinimizedToolbar } = this.props
 
-    const multiplier = parseInt(this.state.multiplier) || 1
-
-    this.updateSizeStyle()
-
-    const videosToolbar = showMinimizedToolbar
-    ? (
-      <div className="videos videos-toolbar" key="videos-toolbar">
-        {minimized.map(props => (
-          <Video
-            {...props}
-            key={props.key}
-            onMaximize={this.props.onMaximize}
-            onMinimizeToggle={this.props.onMinimizeToggle}
-            play={this.props.play}
-          />
-        ))}
-      </div>
-    ) : undefined
-
-    let input: JSX.Element | undefined
     let windows = maximized
 
-    // debug
+    // debug {{{
+    const multiplier = parseInt(this.state.multiplier) || 1
+
+    let input: JSX.Element | undefined
+
     if (this.props.debug) {
       windows = []
 
@@ -138,23 +136,59 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
           position: 'absolute', top: 0, left: 0, opacity: 0.5, zIndex: 100000}}
       />
     }
+    // }}}
 
-    const classNames = classnames('videos videos-grid', {
-      'videos-grid-aspect-ratio': this.props.aspectRatio > 0,
-    })
+    this.maybeUpdateSizeStyle()
 
-    const videosGrid = (
-      <div className={classNames} key="videos-grid" ref={this.gridRef}>
-        {windows.map(props => (
+    const videosToolbar = showMinimizedToolbar && minimized.length > 0
+    ? (
+      <div className="videos videos-toolbar" key="videos-toolbar">
+        {minimized.map(props => (
           <Video
             {...props}
             key={props.key}
             onMaximize={this.props.onMaximize}
             onMinimizeToggle={this.props.onMinimizeToggle}
             play={this.props.play}
-            style={this.videoStyle}
           />
         ))}
+      </div>
+    ) : undefined
+
+    const isAspectRatio = this.props.aspectRatio > 0
+
+    // windows = []
+
+    const maximizedVideos = windows.map(props => (
+      <Video
+        {...props}
+        key={props.key}
+        onMaximize={this.props.onMaximize}
+        onMinimizeToggle={this.props.onMinimizeToggle}
+        play={this.props.play}
+        style={this.videoStyle}
+      />
+    ))
+
+    const videosGrid = isAspectRatio
+    ? (
+      <div
+        className='videos-grid-aspect-ratio'
+        key='videos-grid'
+        ref={this.gridRef}
+      >
+        <div className='videos-grid-aspect-ratio-container'>
+          {maximizedVideos}
+        </div>
+      </div>
+    )
+    : (
+      <div
+        className='videos-grid-flex'
+        key='videos-grid'
+        ref={this.gridRef}
+      >
+        {maximizedVideos}
       </div>
     )
 

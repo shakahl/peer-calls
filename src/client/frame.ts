@@ -35,7 +35,7 @@ export class Frame {
       throw new Error('numWindows must zero or greater: ' + numWindows)
     }
 
-    if (this.numWindows == numWindows) {
+    if (this.numWindows === numWindows) {
       return
     }
 
@@ -44,7 +44,7 @@ export class Frame {
   }
 
   public setSize(size: Dim) {
-    if (this.size === size) {
+    if (this.size.x === size.x && this.size.y === size.y) {
       return
     }
 
