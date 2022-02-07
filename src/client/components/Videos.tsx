@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
 import { MaximizeParams, MinimizeTogglePayload } from '../actions/StreamActions'
@@ -19,42 +20,59 @@ export interface VideosProps {
 
 export interface VideosState {
   videoSize: Dim
+  toolbarVideoStyle: React.CSSProperties
   multiplier: string
 }
 
 export class Videos extends React.PureComponent<VideosProps, VideosState> {
   private gridRef = React.createRef<HTMLDivElement>()
+  private toolbarRef = React.createRef<HTMLDivElement>()
   private frame: Frame
   private videoStyle?: React.CSSProperties
-  private resizeObserver: ResizeObserver
+  private gridObserver: ResizeObserver
+  private toolbarObserver: ResizeObserver
 
   constructor(props: VideosProps) {
     super(props)
 
     this.state = {
       videoSize: {x: 0, y: 0},
+      toolbarVideoStyle: {},
       multiplier: '1',
     }
 
     this.frame = new Frame(this.props.aspectRatio || 16/9)
 
-    this.resizeObserver = new ResizeObserver(this.handleResize)
+    this.gridObserver = new ResizeObserver(this.handleResize)
+    this.toolbarObserver = new ResizeObserver(this.handleToolbarResize)
   }
   componentDidMount = () => {
     this.handleResize()
+    this.handleToolbarResize()
 
     // FIXME if we change style the current might change.
     // Maybe not because it uses the same key.
-    this.resizeObserver.observe(this.gridRef.current!)
+    this.gridObserver.observe(this.gridRef.current!)
+    this.toolbarObserver.observe(this.toolbarRef.current!)
   }
   componentWillUnmount = () => {
-    this.resizeObserver.disconnect()
+    this.gridObserver.disconnect()
+    this.toolbarObserver.disconnect()
+  }
+  handleToolbarResize = () => {
+    const size = this.getSize(this.toolbarRef)
+
+    const aspectRatio = this.props.aspectRatio || 16/9
+
+    this.setState({
+      toolbarVideoStyle: {
+        width: Math.round(size.y * aspectRatio * 100) / 100,
+        height: size.y,
+      },
+    })
   }
   handleResize = () => {
-    const size = this.getSize()
-    if (!size) {
-      return
-    }
+    const size = this.getSize(this.gridRef)
 
     this.frame.setSize(size)
 
@@ -62,13 +80,8 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
       videoSize: size,
     })
   }
-  getSize = () => {
-    if (!this.gridRef.current) {
-      return
-    }
-
-    const { width: x, height: y } =
-      this.gridRef.current.getBoundingClientRect()
+  getSize = <T extends HTMLElement>(ref: React.RefObject<T>) => {
+    const { width: x, height: y } = ref.current!.getBoundingClientRect()
 
     const size = {x, y}
 
@@ -140,9 +153,16 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
 
     this.maybeUpdateSizeStyle()
 
-    const videosToolbar = showMinimizedToolbar && minimized.length > 0
-    ? (
-      <div className="videos videos-toolbar" key="videos-toolbar">
+    const toolbarClassName = classNames('videos videos-toolbar', {
+      'hidden': !showMinimizedToolbar || minimized.length === 0,
+    })
+
+    const videosToolbar = (
+      <div
+        className={toolbarClassName}
+        key="videos-toolbar"
+        ref={this.toolbarRef}
+      >
         {minimized.map(props => (
           <Video
             {...props}
@@ -150,10 +170,11 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
             onMaximize={this.props.onMaximize}
             onMinimizeToggle={this.props.onMinimizeToggle}
             play={this.props.play}
+            style={this.state.toolbarVideoStyle}
           />
         ))}
       </div>
-    ) : undefined
+    )
 
     const isAspectRatio = this.props.aspectRatio > 0
 

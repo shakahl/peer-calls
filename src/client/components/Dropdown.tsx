@@ -21,16 +21,15 @@ extends React.PureComponent<DropdownProps, DropdownState> {
   ref = React.createRef<HTMLUListElement>()
 
   handleClick = () => {
-    // const { top } = this.ref.current!.getBoundingClientRect()
+    const { top } = this.ref.current!.getBoundingClientRect()
 
     this.setState({
       open: !this.state.open,
-      // below: top < 0, // FIXME this will be flipping
-      below: false,
+      below: top < 0, // FIXME this will be flipping
     })
   }
   close = () => {
-    this.setState({ open: false })
+    this.setState({ open: false, below: false })
   }
   render() {
     const { handleClick } = this

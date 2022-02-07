@@ -85,20 +85,23 @@ $shadow-size: 2px
     -moz-transform: rotateY(180deg)
 
 .videos-toolbar
-  // position: absolute
-  // z-index: $z-index-videos-toolbar
-  // left: 0
-  // right: 0
   height: 20%
   max-height: 250px
   display: flex
   flex-wrap: nowrap
   justify-content: center
   overflow-x: auto
-  // overflow-y: hidden
+  overflow-y: hidden
   padding-bottom: 1px
 
-.videos-toolbar .video-container
-  // flex: 0 0 $video-size
-  width: $video-size
-  height: $video-size
+  .video-container
+    flex-grow: 0
+    flex-shrink: 0
+
+  &.hidden
+    display: none
+
+  // .video-container
+  //   // flex: 0 0 $video-size
+  //   width: $video-size
+  //   height: $video-size
