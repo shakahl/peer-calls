@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 import { connect } from 'react-redux'
+import ResizeObserver from 'resize-observer-polyfill'
 import { MaximizeParams, MinimizeTogglePayload } from '../actions/StreamActions'
 import { Dim, Frame } from '../frame'
 import { getStreamsByState, StreamProps } from '../selectors'
@@ -43,6 +44,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
 
     this.frame = new Frame(this.props.aspectRatio || 16/9)
 
+    // FIXME shim.
     this.gridObserver = new ResizeObserver(this.handleResize)
     this.toolbarObserver = new ResizeObserver(this.handleToolbarResize)
   }

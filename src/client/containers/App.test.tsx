@@ -145,7 +145,7 @@ describe('App', () => {
       })
 
       it('minimizes the video on "Maximize" click', () => {
-        let maximized = node.querySelectorAll('.videos-grid video')
+        let maximized = node.querySelectorAll('.videos-grid-aspect-ratio video')
         expect(maximized.length).toBe(2)
 
         let minimized = node.querySelectorAll('.videos-toolbar video')
@@ -163,7 +163,7 @@ describe('App', () => {
           },
         }]])
 
-        maximized = node.querySelectorAll('.videos-grid video')
+        maximized = node.querySelectorAll('.videos-grid-aspect-ratio video')
         expect(maximized.length).toBe(1)
 
         minimized = node.querySelectorAll('.videos-toolbar video')
@@ -178,7 +178,7 @@ describe('App', () => {
         TestUtils.Simulate.change(checkbox)
 
         minimized = node.querySelectorAll('.videos-toolbar video')
-        expect(minimized.length).toBe(0)
+        expect(minimized.length).toBe(1)
 
         TestUtils.Simulate.change(checkbox)
 
@@ -192,7 +192,7 @@ describe('App', () => {
         expect(checkbox).toBeTruthy()
         TestUtils.Simulate.change(checkbox)
 
-        maximized = node.querySelectorAll('.videos-grid video')
+        maximized = node.querySelectorAll('.videos-grid-aspect-ratio video')
         expect(maximized.length).toBe(2)
 
         minimized = node.querySelectorAll('.videos-toolbar video')
