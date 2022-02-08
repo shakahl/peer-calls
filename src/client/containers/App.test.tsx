@@ -136,7 +136,42 @@ describe('App', () => {
         TestUtils.Simulate.click(video)
         expect(dispatchSpy.mock.calls[0][0].type).toBe(constants.MEDIA_PLAY)
       })
+    })
 
+    describe('settings', () => {
+      beforeEach(() => {
+        dispatchSpy.mockClear()
+      })
+
+      it('toggles the useFlexLayout setting', () => {
+        TestUtils.Simulate.click(node.querySelector('.sidebar-menu-settings')!)
+
+        const checkbox = node
+        .querySelector('.sidebar .settings .settings-use-flex-layout-toggle')
+        expect(checkbox).toBeTruthy()
+
+        let els = node.querySelectorAll('.videos-grid-aspect-ratio')
+        expect(els.length).toBe(1)
+
+        els = node.querySelectorAll('.videos-grid-flex')
+        expect(els.length).toBe(0)
+
+        TestUtils.Simulate.change(checkbox!)
+
+        els = node.querySelectorAll('.videos-grid-aspect-ratio')
+        expect(els.length).toBe(0)
+
+        els = node.querySelectorAll('.videos-grid-flex')
+        expect(els.length).toBe(1)
+
+        TestUtils.Simulate.change(checkbox!)
+
+        els = node.querySelectorAll('.videos-grid-aspect-ratio')
+        expect(els.length).toBe(1)
+
+        els = node.querySelectorAll('.videos-grid-flex')
+        expect(els.length).toBe(0)
+      })
     })
 
     describe('video menu', () => {
@@ -171,12 +206,14 @@ describe('App', () => {
 
         TestUtils.Simulate.click(node.querySelector('.sidebar-menu-settings')!)
 
-        // Test that the toolbra shows and hides on checkbox click
+        // Test that the toolbar shows and hides on checkbox click
         let checkbox = node.querySelector(
           '.sidebar .settings .settings-show-minimized-toolbar-toggle')!
         expect(checkbox).toBeTruthy()
         TestUtils.Simulate.change(checkbox)
 
+        // TODO assert class name change instead since we just hide the toolbar
+        // now.
         minimized = node.querySelectorAll('.videos-toolbar video')
         expect(minimized.length).toBe(1)
 

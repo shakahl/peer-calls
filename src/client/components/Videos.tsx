@@ -44,7 +44,6 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
 
     this.frame = new Frame(this.props.aspectRatio || 16/9)
 
-    // FIXME shim.
     this.gridObserver = new ResizeObserver(this.handleResize)
     this.toolbarObserver = new ResizeObserver(this.handleToolbarResize)
   }
@@ -52,8 +51,6 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
     this.handleResize()
     this.handleToolbarResize()
 
-    // FIXME if we change style the current might change.
-    // Maybe not because it uses the same key.
     this.gridObserver.observe(this.gridRef.current!)
     this.toolbarObserver.observe(this.toolbarRef.current!)
   }
@@ -62,7 +59,7 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
     this.toolbarObserver.disconnect()
   }
   handleToolbarResize = () => {
-    const size = this.getSize(this.toolbarRef)
+    const size = getSize(this.toolbarRef)
 
     const aspectRatio = this.props.aspectRatio || 16/9
 
@@ -74,20 +71,13 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
     })
   }
   handleResize = () => {
-    const size = this.getSize(this.gridRef)
+    const size = getSize(this.gridRef)
 
     this.frame.setSize(size)
 
     this.setState({
       videoSize: size,
     })
-  }
-  getSize = <T extends HTMLElement>(ref: React.RefObject<T>) => {
-    const { width: x, height: y } = ref.current!.getBoundingClientRect()
-
-    const size = {x, y}
-
-    return size
   }
   componentDidUpdate() {
     if (this.props.aspectRatio) {
@@ -180,8 +170,6 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
 
     const isAspectRatio = this.props.aspectRatio > 0
 
-    // windows = []
-
     const maximizedVideos = windows.map(props => (
       <Video
         {...props}
@@ -219,13 +207,19 @@ export class Videos extends React.PureComponent<VideosProps, VideosState> {
   }
 }
 
+function getSize<T extends HTMLElement>(ref: React.RefObject<T>): Dim {
+  const {width: x, height: y} = ref.current!.getBoundingClientRect()
+  return {x, y}
+}
+
 function mapStateToProps(state: State) {
   const { minimized, maximized } = getStreamsByState(state)
+  const aspectRatio = state.settings.useFlexLayout ? 0 : 16/9
 
   return {
     minimized,
     maximized,
-    aspectRatio: 16/9,
+    aspectRatio,
     debug: true,
   }
 }

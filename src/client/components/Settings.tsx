@@ -1,13 +1,13 @@
 import uniqueId from 'lodash/uniqueId'
 import React from 'react'
 import { connect } from 'react-redux'
-import { showMinimizedToolbarToggle } from '../actions/SettingsActions'
+import { showMinimizedToolbarToggle, useFlexLayoutToggle } from '../actions/SettingsActions'
 import { SettingsState } from '../reducers/settings'
 import { State } from '../store'
 
-
 export interface SettingsProps extends SettingsState {
   showMinimizedToolbarToggle: typeof showMinimizedToolbarToggle
+  useFlexLayoutToggle: typeof useFlexLayoutToggle
 }
 
 interface CheckboxProps {
@@ -49,6 +49,8 @@ class Settings extends React.PureComponent<SettingsProps> {
     const {
       showMinimizedToolbar,
       showMinimizedToolbarToggle,
+      useFlexLayout,
+      useFlexLayoutToggle,
     } = this.props
 
     return (
@@ -60,6 +62,12 @@ class Settings extends React.PureComponent<SettingsProps> {
             onChange={showMinimizedToolbarToggle}
             label='Show Minimized Toolbar'
           />
+          <Checkbox
+            className='settings-use-flex-layout-toggle'
+            checked={useFlexLayout}
+            onChange={useFlexLayoutToggle}
+            label='Use Flex Layout (legacy)'
+          />
         </ul>
         <div></div> {/*necessary for flex to stretch */}
       </div>
@@ -69,6 +77,7 @@ class Settings extends React.PureComponent<SettingsProps> {
 
 const bind = {
   showMinimizedToolbarToggle,
+  useFlexLayoutToggle,
 }
 
 function mapStateToProps(state: State) {

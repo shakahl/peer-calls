@@ -1,9 +1,10 @@
 import { SettingsAction } from '../actions/SettingsActions'
-import { SETTINGS_SHOW_MINIMIZED_TOOLBAR_TOGGLE } from '../constants'
+import { SETTINGS_SHOW_MINIMIZED_TOOLBAR_TOGGLE, SETTINGS_USE_FLEX_LAYOUT_TOGGLE } from '../constants'
 import { localStorage } from '../window'
 
 export interface SettingsState {
   showMinimizedToolbar: boolean
+  useFlexLayout: boolean
 }
 
 const settingsKey = 'settings'
@@ -11,6 +12,7 @@ const settingsKey = 'settings'
 function init(): SettingsState {
   return {
     showMinimizedToolbar: true,
+    useFlexLayout: false,
   }
 }
 
@@ -24,8 +26,13 @@ function withDefault(
 
   return {
     showMinimizedToolbar:
-      typeof state.showMinimizedToolbar === 'boolean' ?
-      state.showMinimizedToolbar : init.showMinimizedToolbar,
+      typeof state.showMinimizedToolbar === 'boolean'
+        ? state.showMinimizedToolbar
+        : init.showMinimizedToolbar,
+    useFlexLayout:
+      typeof state.useFlexLayout === 'boolean'
+        ? state.useFlexLayout
+        : init.useFlexLayout,
   }
 }
 
@@ -66,6 +73,11 @@ export default function settings(
     return save({
       ...state,
       showMinimizedToolbar: !state.showMinimizedToolbar,
+    })
+  case SETTINGS_USE_FLEX_LAYOUT_TOGGLE:
+    return save({
+      ...state,
+      useFlexLayout: !state.useFlexLayout,
     })
   default:
     return state
