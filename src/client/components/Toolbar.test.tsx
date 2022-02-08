@@ -20,6 +20,7 @@ import { insertableStreamsCodec } from '../insertable-streams'
 import { makeAction } from '../async'
 
 import { MediaConstraint } from '../reducers/media'
+import { sidebarPanelChat } from '../actions/SidebarActions'
 
 interface StreamState {
   cameraStream: LocalStream | null
@@ -33,7 +34,8 @@ class ToolbarWrapper extends React.PureComponent<ToolbarProps, StreamState> {
   }
   render () {
     return <Toolbar
-      chatVisible={this.props.chatVisible}
+      sidebarPanel={this.props.sidebarPanel}
+      sidebarVisible={this.props.sidebarVisible}
       dialState={this.props.dialState}
       nickname={this.props.nickname}
       onToggleSidebar={this.props.onToggleSidebar}
@@ -67,7 +69,8 @@ async function render (store: Store) {
         <ToolbarWrapper
           ref={instance => resolve(instance!)}
           dialState={dialState}
-          chatVisible
+          sidebarVisible
+          sidebarPanel={sidebarPanelChat}
           onHangup={onHangup}
           onToggleSidebar={onToggleChat}
           messagesCount={1}
