@@ -92,7 +92,7 @@ export default class Video extends React.PureComponent<VideoProps> {
         <div className='video-footer'>
           <VUMeter streamId={streamId} />
           <span className='nickname'>{this.props.nickname}</span>
-          <Dropdown label={<MdMenu />}>
+          <Dropdown fixed label={<MdMenu />}>
             <li className='action-maximize' onClick={this.handleMaximize}>
               <MdZoomIn />&nbsp;
               Maximize
